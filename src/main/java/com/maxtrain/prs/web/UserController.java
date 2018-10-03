@@ -21,13 +21,16 @@ public class UserController extends BaseController {
 	
 	@GetMapping(path="/List")
 	public @ResponseBody JsonResponse getAllUsers() {
-		return new JsonResponse(userRepository.findAll());
+		return JsonResponse.ReadSuccess(userRepository.findAll());
 	}
 	
 	@GetMapping(path="/Get/{id}")
 	public @ResponseBody JsonResponse getUser(@PathVariable int id) {
 		Optional<User> user = userRepository.findById(id);
-		return new JsonResponse(user.isPresent() ? user.get() : null);
+		if(!user.isPresent()) {
+			return JsonResponse.ReadByPkFailure("User", id);
+		}
+		return JsonResponse.ReadSuccess(user);
 	}
 	
 	private @ResponseBody JsonResponse saveUser(@RequestBody User user) {
