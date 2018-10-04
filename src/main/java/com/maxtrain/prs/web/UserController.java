@@ -21,26 +21,26 @@ public class UserController extends BaseController {
 	
 	@GetMapping(path="/List")
 	public @ResponseBody JsonResponse getAllUsers() {
-		return JsonResponse.ReadSuccess(userRepository.findAll());
+		return JsonResponse.readSuccess(userRepository.findAll());
 	}
 	
 	@GetMapping(path="/Get/{id}")
 	public @ResponseBody JsonResponse getUser(@PathVariable int id) {
 		Optional<User> user = userRepository.findById(id);
 		if(!user.isPresent()) {
-			return JsonResponse.ReadByPkFailure("User", id);
+			return JsonResponse.readByPkFailure("User", id);
 		}
-		return JsonResponse.ReadSuccess(user);
+		return JsonResponse.readSuccess(user);
 	}
 	
 	private @ResponseBody JsonResponse saveUser(@RequestBody User user) {
 		try {
 			userRepository.save(user);
-			return new JsonResponse(0, "User Added/Changed.", user, null);
+			return JsonResponse.maintAddChangeSuccess(user);
 		} catch (DataIntegrityViolationException ex) {
-			return new JsonResponse(-1, ex.getRootCause().toString(), null, ex);
+			return JsonResponse.dataIntegrityViolationError(ex);
 		} catch (Exception ex) {
-			return new JsonResponse(-2, ex.getMessage(), null, ex);
+			return JsonResponse.generalExceptionError(ex);
 		}
 	}
 	
@@ -56,9 +56,9 @@ public class UserController extends BaseController {
 	public @ResponseBody JsonResponse removeUser(@RequestBody User user) {
 		try {
 			userRepository.delete(user);
-			return new JsonResponse(0, "User Deleted.", user, null);
+			return JsonResponse.maintDeleteSuccess(user);
 		} catch (Exception ex) {
-			return new JsonResponse(-2, ex.getMessage(), null, ex);
+			return JsonResponse.generalExceptionError(ex);
 		}
 	}
 }
